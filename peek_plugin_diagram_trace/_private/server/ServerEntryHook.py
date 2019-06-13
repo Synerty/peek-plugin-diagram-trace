@@ -1,19 +1,12 @@
 import logging
-import os
 
-from jsoncfg.value_mappers import require_string
 from peek_plugin_base.server.PluginServerEntryHookABC import PluginServerEntryHookABC
 from peek_plugin_base.server.PluginServerStorageEntryHookABC import \
     PluginServerStorageEntryHookABC
-from peek_plugin_base.storage.DbConnection import DbConnection
-from sqlalchemy import MetaData
-
 from peek_plugin_diagram_trace._private.storage import DeclarativeBase
 from peek_plugin_diagram_trace._private.storage.DeclarativeBase import \
     loadStorageTuples
 from peek_plugin_diagram_trace._private.tuples import loadPrivateTuples
-from peek_plugin_diagram_trace.tuples import loadPublicTuples
-from .DiagramTraceApi import DiagramTraceApi
 from .TupleActionProcessor import makeTupleActionProcessorHandler
 from .TupleDataObservable import makeTupleDataObservableHandler
 from .admin_backend import makeAdminBackendHandlers
@@ -31,54 +24,6 @@ class ServerEntryHook(PluginServerEntryHookABC, PluginServerStorageEntryHookABC)
         #: Loaded Objects, This is a list of all objects created when we start
         self._loadedObjects = []
 
-        self._api = None
-
-    def _migrateStorageSchema(self, metadata: MetaData) -> None:
-        """ Migrate Storage Schema
-
-        Rename the schema
-
-        """
-
-        relDir = self._packageCfg.config.storage.alembicDir(require_string)
-        alembicDir = os.path.join(self.rootDir, relDir)
-        if not os.path.isdir(alembicDir): raise NotADirectoryError(alembicDir)
-
-        dbConn = DbConnection(
-            dbConnectString=self.platform.dbConnectString,
-            metadata=metadata,
-            alembicDir=alembicDir,
-            enableCreateAll=False
-        )
-
-        # Rename the plugin schema to core.
-        renameToCoreSql = '''
-            DO $$
-            BEGIN
-                IF EXISTS(
-                    SELECT schema_name
-                      FROM information_schema.schemata
-                      WHERE schema_name = 'pl_diagram_trace'
-                  )
-                THEN
-                  EXECUTE ' DROP SCHEMA IF EXISTS pl_diagram_trace CASCADE ';
-                  EXECUTE ' ALTER SCHEMA pl_generic_diagram_menu RENAME TO pl_diagram_trace ';
-                END IF;
-            END
-            $$;
-        '''
-
-        dbSession = dbConn.ormSessionCreator()
-        try:
-            dbSession.execute(renameToCoreSql)
-            dbSession.commit()
-
-        finally:
-            dbSession.close()
-            dbConn.dbEngine.dispose()
-
-        PluginServerStorageEntryHookABC._migrateStorageSchema(self, metadata)
-
     def load(self) -> None:
         """ Load
 
@@ -88,7 +33,6 @@ class ServerEntryHook(PluginServerEntryHookABC, PluginServerStorageEntryHookABC)
         """
         loadStorageTuples()
         loadPrivateTuples()
-        loadPublicTuples()
         logger.debug("Loaded")
 
     @property
@@ -116,10 +60,6 @@ class ServerEntryHook(PluginServerEntryHookABC, PluginServerStorageEntryHookABC)
 
         self._loadedObjects.append(mainController)
         self._loadedObjects.append(makeTupleActionProcessorHandler(mainController))
-
-        # Initialise the API object that will be shared with other plugins
-        self._api = DiagramTraceApi(mainController)
-        self._loadedObjects.append(self._api)
 
         logger.debug("Started")
 

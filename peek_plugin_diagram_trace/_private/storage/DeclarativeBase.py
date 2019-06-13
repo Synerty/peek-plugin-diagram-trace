@@ -1,6 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.schema import MetaData
+from txhttputil.util.ModuleUtil import filterModules
 
 metadata = MetaData(schema="pl_diagram_trace")
 DeclarativeBase = declarative_base(metadata=metadata)
@@ -17,8 +18,7 @@ def loadStorageTuples():
     deserialized by the vortex.
 
     """
-    from . import DiagramTraceTuple
-    DiagramTraceTuple.__unused = False
-
-    from . import Setting
-    Setting.__unused = False
+    for mod in filterModules(__package__, __file__):
+        if mod.startswith("Declarative"):
+            continue
+        __import__(mod, locals(), globals())

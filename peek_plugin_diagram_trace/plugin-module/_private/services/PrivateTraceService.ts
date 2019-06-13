@@ -1,20 +1,21 @@
-import {Injectable, Optional} from "@angular/core";
+import {Injectable} from "@angular/core";
 
 import {
     DiagramItemPopupContextI,
-    DiagramItemPopupService
+    DiagramItemPopupService,
+    DiagramLookupService,
+    DiagramMenuItemI,
+    DiagramOverrideService
 } from "@peek/peek_plugin_diagram";
-import {PrivateGenericTupleService} from "./PrivateGenericTupleService";
-import {DiagramTraceTuple} from "../tuples/DiagramTraceTuple";
-import {ComponentLifecycleEventEmitter, extend, TupleSelector} from "@synerty/vortexjs";
+
+import {DiagramOverrideColor} from "@peek/peek_plugin_diagram/override";
+import {ComponentLifecycleEventEmitter} from "@synerty/vortexjs";
 
 import {
-    DocDbDocumentTypeTuple,
-    DocDbPropertyTuple,
-    DocDbService,
-    DocumentResultI,
-    DocumentTuple
-} from "@peek/peek_plugin_docdb";
+    GraphDbService,
+    GraphDbTraceResultTuple,
+    TraceConfigListItemI
+} from "@peek/peek_plugin_graphdb";
 
 /** DMS Diagram Item Popup Service
  *
@@ -26,17 +27,15 @@ import {
 @Injectable()
 export class PrivateTraceService extends ComponentLifecycleEventEmitter {
 
-    private menus: DiagramTraceTuple [] = [];
+    private traceConfigsByModelSetKey: { [modelSetKey: string]: TraceConfigListItemI[] } = {};
 
-    constructor(@Optional() private diagramPopup: DiagramItemPopupService,
-                private tupleService: PrivateGenericTupleService,
-                private docDbService: DocDbService) {
+    private appliedOverrides: DiagramOverrideColor[] = [];
+
+    constructor(private diagramPopup: DiagramItemPopupService,
+                private diagramOverrideService: DiagramOverrideService,
+                private graphDbService: GraphDbService,
+                private diagramLookupService: DiagramLookupService) {
         super();
-
-        this.tupleService.tupleDataOfflineObserver
-            .subscribeToTupleSelector(new TupleSelector(DiagramTraceTuple.tupleName, {}))
-            .subscribe((tuples: DiagramTraceTuple[]) => this.menus = tuples);
-
 
         if (this.diagramPopup != null) {
             this.diagramPopup
@@ -48,7 +47,21 @@ export class PrivateTraceService extends ComponentLifecycleEventEmitter {
 
         }
 
+    }
 
+    private menusForModelSet(modelSetKey: string): Promise<TraceConfigListItemI[]> {
+        if (this.traceConfigsByModelSetKey[modelSetKey] != null)
+            return Promise.resolve(this.traceConfigsByModelSetKey[modelSetKey]);
+
+        return new Promise<TraceConfigListItemI[]>((resolve, reject) => {
+            this.graphDbService
+                .traceConfigListItemsObservable(modelSetKey)
+                .takeUntil(this.onDestroyEvent)
+                .subscribe((tuples: TraceConfigListItemI[]) => {
+                    this.traceConfigsByModelSetKey[modelSetKey] = tuples;
+                    resolve(tuples);
+                });
+        })
     }
 
 
@@ -56,51 +69,71 @@ export class PrivateTraceService extends ComponentLifecycleEventEmitter {
         if (context.key == null)
             return;
 
-        this.docDbService.getObjects("pofDiagram", [context.key])
-            .then((docs: DocumentResultI) => {
-                console.log(docs);
-                let doc = docs[context.key];
-                let contextCopy = extend({}, context);
-                if (doc == null) {
-                    console.log(`Document ${context.key} can not be found.`);
-                } else {
-                    contextCopy.data = extend({}, doc.document, contextCopy.data);
+        this.menusForModelSet(context.modelSetKey)
+            .then((traceConfigs: TraceConfigListItemI[]) => {
+                if (traceConfigs == null || traceConfigs.length == 0)
+                    return;
+
+                const rootMenu: DiagramMenuItemI = {
+                    name: "Trace",
+                    tooltip: "Start a trace from this component",
+                    icon: null,
+                    callback: null,
+                    children: [],
+                    closeOnCallback: true
+                };
+
+                for (const item of traceConfigs) {
+                    rootMenu.children.push({
+                        name: "Trace",
+                        tooltip: "Start a trace from this component",
+                        icon: null,
+                        callback: () => this.menuClicked(item.key, context),
+                        children: [],
+                        closeOnCallback: true
+                    });
                 }
 
-                this.addMenus(contextCopy);
-            });
+                context.addMenuItem(rootMenu);
+            })
+            .catch(e => console.log(`ERROR: Diagram Trace ${e}`));
     }
 
-    private addMenus(context: DiagramItemPopupContextI): void {
-        for (let menu of this.menus) {
-            if (!(context.modelSetKey == menu.modelSetKey || menu.modelSetKey == null))
-                continue;
 
-            if (!(context.coordSetKey == menu.coordSetKey || menu.coordSetKey == null))
-                continue;
+    private menuClicked(traceKey: string, context: DiagramItemPopupContextI): void {
 
-            let url = menu.url;
-            url = url.replace("{key}", context.key);
+        const colors = this.diagramLookupService
+            .colorsOrderedByName(context.modelSetKey);
 
-            let keys = Object.getOwnPropertyNames(context.data);
-            for (let key of keys) {
-                let val = context.data[key] == null ? '' : context.data[key];
-                url = url.replace(`{${key}}`, val);
+        let color = null;
+        for (const c of colors) {
+            if (c.color == "green") {
+                color = c;
+                return;
             }
-
-            context.addMenuItem({
-                name: menu.title,
-                tooltip: null,
-                icon: menu.faIcon,
-                callback: () => this.menuClicked(menu, url),
-                children: [],
-                closeOnCallback: true
-            });
         }
-    }
 
-    private menuClicked(menu: DiagramTraceTuple, url: string): void {
-        window.open(url);
-    }
+        this.graphDbService
+            .getTraceResult(context.modelSetKey, traceKey, context.key)
+            .then((traceResult: GraphDbTraceResultTuple) => {
+                const override = new DiagramOverrideColor(
+                    context.modelSetKey, context.coordSetKey
+                );
+                override.setLineColor(color);
 
+                for (let edge of traceResult.edges) {
+                    override.addDispKeys([edge.key]);
+                }
+
+                for (let vertex of traceResult.edges) {
+                    override.addDispKeys([vertex.key]);
+                }
+
+                this.diagramOverrideService.applyOverride(override);
+                this.appliedOverrides.push(override);
+            })
+            .catch(e => console.log(`ERROR: Diagram Trace ${e}`));
+
+
+    }
 }

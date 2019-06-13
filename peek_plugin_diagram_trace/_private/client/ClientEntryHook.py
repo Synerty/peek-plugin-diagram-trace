@@ -5,7 +5,6 @@ from peek_plugin_base.client.PluginClientEntryHookABC import PluginClientEntryHo
 from .DeviceTupleDataObservableProxy import makeDeviceTupleDataObservableProxy
 
 from peek_plugin_diagram_trace._private.tuples import loadPrivateTuples
-from peek_plugin_diagram_trace.tuples import loadPublicTuples
 
 from peek_plugin_diagram_trace._private.storage.DeclarativeBase import loadStorageTuples
 
@@ -34,7 +33,6 @@ class ClientEntryHook(PluginClientEntryHookABC):
         loadStorageTuples()
 
         loadPrivateTuples()
-        loadPublicTuples()
 
         logger.debug("Loaded")
 

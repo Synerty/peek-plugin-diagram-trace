@@ -6,7 +6,9 @@ import {
     TupleLoader,
     VortexService
 } from "@synerty/vortexjs";
-import {SettingPropertyTuple, diagramTraceFilt} from "@peek/peek_plugin_diagram_trace/_private";
+import {
+    SettingPropertyTuple, diagramTraceFilt
+} from "@peek/peek_plugin_diagram_trace/_private";
 
 
 @Component({
