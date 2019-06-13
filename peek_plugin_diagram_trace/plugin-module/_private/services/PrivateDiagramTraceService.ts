@@ -16,6 +16,7 @@ import {
     GraphDbTraceResultTuple,
     TraceConfigListItemI
 } from "@peek/peek_plugin_graphdb";
+import {Ng2BalloonMsgService} from "@synerty/ng2-balloon-msg";
 
 /** DMS Diagram Item Popup Service
  *
@@ -25,13 +26,14 @@ import {
  *
  */
 @Injectable()
-export class PrivateTraceService extends ComponentLifecycleEventEmitter {
+export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
 
     private traceConfigsByModelSetKey: { [modelSetKey: string]: TraceConfigListItemI[] } = {};
 
     private appliedOverrides: DiagramOverrideColor[] = [];
 
-    constructor(private diagramPopup: DiagramItemPopupService,
+    constructor(private balloonMsg: Ng2BalloonMsgService,
+                private diagramPopup: DiagramItemPopupService,
                 private diagramOverrideService: DiagramOverrideService,
                 private graphDbService: GraphDbService,
                 private diagramLookupService: DiagramLookupService) {
@@ -80,12 +82,12 @@ export class PrivateTraceService extends ComponentLifecycleEventEmitter {
                     icon: null,
                     callback: null,
                     children: [],
-                    closeOnCallback: true
+                    closeOnCallback: false
                 };
 
                 for (const item of traceConfigs) {
                     rootMenu.children.push({
-                        name: "Trace",
+                        name: item.name,
                         tooltip: "Start a trace from this component",
                         icon: null,
                         callback: () => this.menuClicked(item.key, context),
@@ -109,7 +111,7 @@ export class PrivateTraceService extends ComponentLifecycleEventEmitter {
         for (const c of colors) {
             if (c.color == "green") {
                 color = c;
-                return;
+                break;
             }
         }
 
@@ -120,6 +122,7 @@ export class PrivateTraceService extends ComponentLifecycleEventEmitter {
                     context.modelSetKey, context.coordSetKey
                 );
                 override.setLineColor(color);
+                override.setColor(color);
 
                 for (let edge of traceResult.edges) {
                     override.addDispKeys([edge.key]);
@@ -132,7 +135,7 @@ export class PrivateTraceService extends ComponentLifecycleEventEmitter {
                 this.diagramOverrideService.applyOverride(override);
                 this.appliedOverrides.push(override);
             })
-            .catch(e => console.log(`ERROR: Diagram Trace ${e}`));
+            .catch(e => this.balloonMsg.showError(`ERROR: Diagram Trace ${e}`));
 
 
     }
