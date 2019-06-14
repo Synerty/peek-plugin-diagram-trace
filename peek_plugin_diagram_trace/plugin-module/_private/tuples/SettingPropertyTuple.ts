@@ -1,6 +1,7 @@
 import {addTupleType, Tuple} from "@synerty/vortexjs";
 import {diagramTraceTuplePrefix} from "../PluginNames";
 
+export let TraceColorsPropertyName = 'Trace Colors';
 
 @addTupleType
 export class SettingPropertyTuple extends Tuple {
