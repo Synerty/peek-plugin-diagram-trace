@@ -5,7 +5,9 @@ import {
     DiagramItemPopupService,
     DiagramLookupService,
     DiagramMenuItemI,
-    DiagramOverrideService
+    DiagramOverrideService,
+    DiagramToolbarService,
+    ToolbarTypeE
 } from "@peek/peek_plugin_diagram";
 
 import {DiagramOverrideColor} from "@peek/peek_plugin_diagram/override";
@@ -17,6 +19,7 @@ import {
     TraceConfigListItemI
 } from "@peek/peek_plugin_graphdb";
 import {Ng2BalloonMsgService} from "@synerty/ng2-balloon-msg";
+import {diagramTraceTuplePrefix} from "../PluginNames";
 
 /** DMS Diagram Item Popup Service
  *
@@ -32,12 +35,18 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
 
     private appliedOverrides: DiagramOverrideColor[] = [];
 
+    private readonly clearTracesButtonKey: string;
+
     constructor(private balloonMsg: Ng2BalloonMsgService,
                 private diagramPopup: DiagramItemPopupService,
+                private diagramToolbar: DiagramToolbarService,
                 private diagramOverrideService: DiagramOverrideService,
                 private graphDbService: GraphDbService,
                 private diagramLookupService: DiagramLookupService) {
         super();
+
+        this.clearTracesButtonKey = diagramTraceTuplePrefix
+            + "diagramTraceTuplePrefix";
 
         if (this.diagramPopup != null) {
             this.diagramPopup
@@ -134,9 +143,43 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
 
                 this.diagramOverrideService.applyOverride(override);
                 this.appliedOverrides.push(override);
+
+                this.addClearTracesButton(context.modelSetKey, context.coordSetKey);
             })
             .catch(e => this.balloonMsg.showError(`ERROR: Diagram Trace ${e}`));
 
+    }
 
+    private addClearTracesButton(modelSetKey: string, coordSetKey: string) {
+        if (this.appliedOverrides.length != 1)
+            return;
+
+        this.diagramToolbar.addToolButton(
+            modelSetKey,
+            coordSetKey, {
+                key: this.clearTracesButtonKey,
+                name: "Clear Traces",
+                tooltip: "Clear Traces",
+                icon: 'eraser',
+                callback: () => this.clearAllTraces(),
+                children: []
+            },
+            ToolbarTypeE.ViewToolbar);
+    }
+
+    private removeClearTracesButton() {
+        if (this.appliedOverrides.length != 0)
+            return;
+
+        this.diagramToolbar.removeToolButton(this.clearTracesButtonKey);
+    }
+
+    private clearAllTraces(): void {
+        while (this.appliedOverrides.length != 0) {
+            const override = this.appliedOverrides.pop();
+            this.diagramOverrideService.removeOverride(override);
+        }
+
+        this.removeClearTracesButton();
     }
 }
