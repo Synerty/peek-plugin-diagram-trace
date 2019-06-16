@@ -1,8 +1,12 @@
 import logging
-from vortex.sqla_orm.OrmCrudHandler import OrmCrudHandler
+
+from vortex.TupleSelector import TupleSelector
+from vortex.handler.TupleDataObservableHandler import TupleDataObservableHandler
+from vortex.sqla_orm.OrmCrudHandler import OrmCrudHandler, OrmCrudHandlerExtension
 
 from peek_plugin_diagram_trace._private.PluginNames import diagramTraceFilt
-from peek_plugin_diagram_trace._private.storage.Setting import SettingProperty, globalSetting
+from peek_plugin_diagram_trace._private.storage.Setting import SettingProperty, \
+    globalSetting
 
 logger = logging.getLogger(__name__)
 
@@ -19,10 +23,33 @@ class __CrudHandler(OrmCrudHandler):
         return [p for p in globalSetting(session).propertyObjects]
 
 
+class __ExtUpdateObservable(OrmCrudHandlerExtension):
+    """ Update Observable ORM Crud Extension
+
+    This extension is called after events that will alter data,
+    it then notifies the observer.
+
+    """
+
+    def __init__(self, tupleObservable):
+        OrmCrudHandlerExtension.__init__(self)
+        self._tupleObservable = tupleObservable
+
+    def _tellObserver(self, tuple_, tuples, session, payloadFilt):
+        self._tupleObservable.notifyOfTupleUpdate(
+            TupleSelector(SettingProperty.tupleName(), {})
+        )
+        return True
+
+    afterUpdateCommit = _tellObserver
+
+
 # This method creates an instance of the handler class.
-def makeSettingPropertyHandler(dbSessionCreator):
+def makeSettingPropertyHandler(dbSessionCreator,
+                               tupleObservable: TupleDataObservableHandler):
     handler = __CrudHandler(dbSessionCreator, SettingProperty,
                             filtKey, retreiveAll=True)
 
-    logger.debug("Started")
+    handler.addExtension(SettingProperty, __ExtUpdateObservable(tupleObservable))
+
     return handler

@@ -5,4 +5,4 @@ from .SettingPropertyHandler import makeSettingPropertyHandler
 
 def makeAdminBackendHandlers(tupleObservable: TupleDataObservableHandler,
                              dbSessionCreator):
-    yield makeSettingPropertyHandler(dbSessionCreator)
+    yield makeSettingPropertyHandler(dbSessionCreator, tupleObservable)
