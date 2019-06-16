@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 
 import {
+    DiagramBranchService,
     DiagramCoordSetService,
     DiagramItemPopupContextI,
     DiagramItemPopupService,
@@ -51,6 +52,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
     constructor(private diagramCoordSetService: DiagramCoordSetService,
                 private tupleService: PrivateDiagramTraceTupleService,
                 private balloonMsg: Ng2BalloonMsgService,
+                private diagramBranchService: DiagramBranchService,
                 private diagramPopup: DiagramItemPopupService,
                 private diagramToolbar: DiagramToolbarService,
                 private diagramOverrideService: DiagramOverrideService,
@@ -61,15 +63,19 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
         this.clearTracesButtonKey = diagramTraceTuplePrefix
             + "diagramTraceTuplePrefix";
 
-        if (this.diagramPopup != null) {
-            this.diagramPopup
-                .itemPopupObservable()
-                .takeUntil(this.onDestroyEvent)
-                .subscribe((context: DiagramItemPopupContextI) => {
-                    this.handlePopup(context);
-                });
+        this.diagramPopup
+            .itemPopupObservable()
+            .takeUntil(this.onDestroyEvent)
+            .subscribe((context: DiagramItemPopupContextI) => {
+                this.handlePopup(context);
+            });
 
-        }
+        // Remove all traces if the diagram goes into edit mode
+        this.diagramBranchService
+            .startEditingObservable()
+            .takeUntil(this.onDestroyEvent)
+            .subscribe(() => this.clearAllTraces());
+
 
         const settingsPropTs = new TupleSelector(
             SettingPropertyTuple.tupleName, {}
