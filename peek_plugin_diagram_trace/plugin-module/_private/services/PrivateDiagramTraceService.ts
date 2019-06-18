@@ -169,8 +169,8 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
 
                 for (const item of traceConfigs) {
                     rootMenu.children.push({
-                        name: item.name,
-                        tooltip: "Start a trace from this component",
+                        name: item.title,
+                        tooltip: `Trace type = ${item.name}`,
                         icon: null,
                         callback: () => this.menuClicked(item.key, context),
                         children: [],
@@ -190,6 +190,12 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
         this.graphDbService
             .getTraceResult(context.modelSetKey, traceKey, context.key)
             .then((traceResult: GraphDbTraceResultTuple) => {
+                if (traceResult.traceAbortedMessage != null) {
+                    this.balloonMsg.showError(traceResult.traceAbortedMessage);
+                    return;
+                }
+
+
                 // Get the color and rotate the queue
                 const colors = this.colorsByModelSet[context.modelSetKey];
                 const color = colors.shift();
