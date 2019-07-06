@@ -2,11 +2,9 @@
 Administration
 ==============
 
-The Diagram Generic Menu allows administrators to add additional menus that appear when
-a display item is selected on the diagram.
+The Diagram Trace Menu allows administrators to set the colors that will be used for
+a trace.
 
-Menu items can have multiple placeholders from the DocDB and the data from the display
-item.
 
 .. toctree::
     :maxdepth: 3

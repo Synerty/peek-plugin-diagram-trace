@@ -89,6 +89,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                     switch (prop.key) {
                         case TraceColorsPropertyName: {
                             this.loadColors(prop.char_value);
+                            break;
                         }
                         default: {
                             // pass
