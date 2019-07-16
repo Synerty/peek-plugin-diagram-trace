@@ -1,5 +1,6 @@
-=================
-DiagramTrace Plugin 1
-=================
+=========================
+Peek Diagram Trace Plugin
+=========================
 
-This is a Peek Plugin, from the diagramTrace.
+This Peek Plugin uses the GraphDB plugin to trace the connectivity from selected
+equipment, then highlight the trace result.
