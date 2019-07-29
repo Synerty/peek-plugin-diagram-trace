@@ -5,6 +5,7 @@ import {
     DiagramCoordSetService,
     DiagramLookupService,
     DiagramOverrideService,
+    diagramPluginName,
     DiagramToolbarService,
     ToolbarTypeE
 } from "@peek/peek_plugin_diagram";
@@ -12,7 +13,8 @@ import {
 import {
     ObjectActionI,
     ObjectPopupContextI,
-    ObjectPopupService
+    ObjectPopupService,
+    ObjectPopupTypeE
 } from "@peek/peek_plugin_object_popup";
 
 import {DiagramOverrideColor} from "@peek/peek_plugin_diagram/override";
@@ -56,7 +58,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 private tupleService: PrivateDiagramTraceTupleService,
                 private balloonMsg: Ng2BalloonMsgService,
                 private diagramBranchService: DiagramBranchService,
-                private diagramPopup: ObjectPopupService,
+                private objectPopupService: ObjectPopupService,
                 private diagramToolbar: DiagramToolbarService,
                 private diagramOverrideService: DiagramOverrideService,
                 private graphDbService: GraphDbService,
@@ -66,12 +68,17 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
         this.clearTracesButtonKey = diagramTraceTuplePrefix
             + "diagramTraceTuplePrefix";
 
-        this.diagramPopup
-            .tooltipPopupObservable()
+        this.objectPopupService
+            .popupObservable(ObjectPopupTypeE.summaryPopup)
+            .filter((c: ObjectPopupContextI) => c.triggeredByPlugin == diagramPluginName)
             .takeUntil(this.onDestroyEvent)
-            .subscribe((context: ObjectPopupContextI) => {
-                this.handlePopup(context);
-            });
+            .subscribe((c: ObjectPopupContextI) => this.handlePopup(c));
+
+        this.objectPopupService
+            .popupObservable(ObjectPopupTypeE.detailPopup)
+            .filter((c: ObjectPopupContextI) => c.triggeredByPlugin == diagramPluginName)
+            .takeUntil(this.onDestroyEvent)
+            .subscribe((c: ObjectPopupContextI) => this.handlePopup(c));
 
         // Remove all traces if the diagram goes into edit mode
         this.diagramBranchService
@@ -163,9 +170,9 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                     return;
 
                 const rootMenu: ObjectActionI = {
-                    name: "Trace",
-                    tooltip: "Start a trace from this component",
-                    icon: null,
+                    name: null,
+                    tooltip: "Start a trace from this equipment",
+                    icon: 'highlighter',
                     callback: null,
                     children: [],
                     closeOnCallback: false
@@ -182,13 +189,14 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                     });
                 }
 
-                context.addMenuItem(rootMenu);
+                context.addAction(rootMenu);
             })
             .catch(e => console.log(`ERROR: Diagram Trace ${e}`));
     }
 
 
     private menuClicked(traceKey: string, context: ObjectPopupContextI): void {
+        const coordSetKey = context.options.triggeredForContext;
 
 
         this.graphDbService
@@ -199,13 +207,15 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                     return;
                 }
 
-
                 // Get the color and rotate the queue
                 const colors = this.colorsByModelSet[context.modelSetKey];
                 const color = colors.shift();
                 colors.push(color);
 
-                const override = new DiagramOverrideColor(context.modelSetKey);
+                const override = new DiagramOverrideColor(
+                    context.modelSetKey, coordSetKey
+                );
+
                 override.setLineColor(color);
                 override.setColor(color);
 
@@ -220,7 +230,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 this.diagramOverrideService.applyOverride(override);
                 this.appliedOverrides.push(override);
 
-                this.addClearTracesButton(context.modelSetKey);
+                this.addClearTracesButton(context.modelSetKey, coordSetKey);
             })
             .catch(e => this.balloonMsg.showError(`ERROR: Diagram Trace ${e}`));
 
