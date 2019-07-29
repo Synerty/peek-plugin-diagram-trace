@@ -11,11 +11,11 @@ import {
 } from "@peek/peek_plugin_diagram";
 
 import {
-    ObjectActionI,
-    ObjectPopupContextI,
-    ObjectPopupService,
-    ObjectPopupTypeE
-} from "@peek/peek_plugin_object_popup";
+    DocDbPopupActionI,
+    DocDbPopupContextI,
+    DocDbPopupService,
+    DocDbPopupTypeE
+} from "@peek/peek_plugin_docdb";
 
 import {DiagramOverrideColor} from "@peek/peek_plugin_diagram/override";
 
@@ -58,7 +58,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 private tupleService: PrivateDiagramTraceTupleService,
                 private balloonMsg: Ng2BalloonMsgService,
                 private diagramBranchService: DiagramBranchService,
-                private objectPopupService: ObjectPopupService,
+                private objectPopupService: DocDbPopupService,
                 private diagramToolbar: DiagramToolbarService,
                 private diagramOverrideService: DiagramOverrideService,
                 private graphDbService: GraphDbService,
@@ -69,16 +69,16 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
             + "diagramTraceTuplePrefix";
 
         this.objectPopupService
-            .popupObservable(ObjectPopupTypeE.summaryPopup)
-            .filter((c: ObjectPopupContextI) => c.triggeredByPlugin == diagramPluginName)
+            .popupObservable(DocDbPopupTypeE.summaryPopup)
+            .filter((c: DocDbPopupContextI) => c.triggeredByPlugin == diagramPluginName)
             .takeUntil(this.onDestroyEvent)
-            .subscribe((c: ObjectPopupContextI) => this.handlePopup(c));
+            .subscribe((c: DocDbPopupContextI) => this.handlePopup(c));
 
         this.objectPopupService
-            .popupObservable(ObjectPopupTypeE.detailPopup)
-            .filter((c: ObjectPopupContextI) => c.triggeredByPlugin == diagramPluginName)
+            .popupObservable(DocDbPopupTypeE.detailPopup)
+            .filter((c: DocDbPopupContextI) => c.triggeredByPlugin == diagramPluginName)
             .takeUntil(this.onDestroyEvent)
-            .subscribe((c: ObjectPopupContextI) => this.handlePopup(c));
+            .subscribe((c: DocDbPopupContextI) => this.handlePopup(c));
 
         // Remove all traces if the diagram goes into edit mode
         this.diagramBranchService
@@ -151,7 +151,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
     }
 
 
-    private handlePopup(context: ObjectPopupContextI): void {
+    private handlePopup(context: DocDbPopupContextI): void {
         if (context.key == null)
             return;
 
@@ -169,7 +169,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 if (traceConfigs == null || traceConfigs.length == 0)
                     return;
 
-                const rootMenu: ObjectActionI = {
+                const rootMenu: DocDbPopupActionI = {
                     name: null,
                     tooltip: "Start a trace from this equipment",
                     icon: 'highlighter',
@@ -195,7 +195,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
     }
 
 
-    private menuClicked(traceKey: string, context: ObjectPopupContextI): void {
+    private menuClicked(traceKey: string, context: DocDbPopupContextI): void {
         const coordSetKey = context.options.triggeredForContext;
 
 
