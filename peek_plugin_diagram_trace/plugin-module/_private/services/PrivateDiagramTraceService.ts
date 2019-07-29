@@ -3,14 +3,17 @@ import {Injectable} from "@angular/core";
 import {
     DiagramBranchService,
     DiagramCoordSetService,
-    DiagramItemPopupContextI,
-    DiagramItemPopupService,
     DiagramLookupService,
-    DiagramMenuItemI,
     DiagramOverrideService,
     DiagramToolbarService,
     ToolbarTypeE
 } from "@peek/peek_plugin_diagram";
+
+import {
+    ObjectActionI,
+    ObjectPopupContextI,
+    ObjectPopupService
+} from "@peek/peek_plugin_object_popup";
 
 import {DiagramOverrideColor} from "@peek/peek_plugin_diagram/override";
 
@@ -53,7 +56,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 private tupleService: PrivateDiagramTraceTupleService,
                 private balloonMsg: Ng2BalloonMsgService,
                 private diagramBranchService: DiagramBranchService,
-                private diagramPopup: DiagramItemPopupService,
+                private diagramPopup: ObjectPopupService,
                 private diagramToolbar: DiagramToolbarService,
                 private diagramOverrideService: DiagramOverrideService,
                 private graphDbService: GraphDbService,
@@ -64,9 +67,9 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
             + "diagramTraceTuplePrefix";
 
         this.diagramPopup
-            .itemPopupObservable()
+            .tooltipPopupObservable()
             .takeUntil(this.onDestroyEvent)
-            .subscribe((context: DiagramItemPopupContextI) => {
+            .subscribe((context: ObjectPopupContextI) => {
                 this.handlePopup(context);
             });
 
@@ -141,7 +144,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
     }
 
 
-    private handlePopup(context: DiagramItemPopupContextI): void {
+    private handlePopup(context: ObjectPopupContextI): void {
         if (context.key == null)
             return;
 
@@ -159,7 +162,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 if (traceConfigs == null || traceConfigs.length == 0)
                     return;
 
-                const rootMenu: DiagramMenuItemI = {
+                const rootMenu: ObjectActionI = {
                     name: "Trace",
                     tooltip: "Start a trace from this component",
                     icon: null,
@@ -185,7 +188,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
     }
 
 
-    private menuClicked(traceKey: string, context: DiagramItemPopupContextI): void {
+    private menuClicked(traceKey: string, context: ObjectPopupContextI): void {
 
 
         this.graphDbService
@@ -202,9 +205,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 const color = colors.shift();
                 colors.push(color);
 
-                const override = new DiagramOverrideColor(
-                    context.modelSetKey, context.coordSetKey
-                );
+                const override = new DiagramOverrideColor(context.modelSetKey);
                 override.setLineColor(color);
                 override.setColor(color);
 
@@ -219,7 +220,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 this.diagramOverrideService.applyOverride(override);
                 this.appliedOverrides.push(override);
 
-                this.addClearTracesButton(context.modelSetKey, context.coordSetKey);
+                this.addClearTracesButton(context.modelSetKey);
             })
             .catch(e => this.balloonMsg.showError(`ERROR: Diagram Trace ${e}`));
 
