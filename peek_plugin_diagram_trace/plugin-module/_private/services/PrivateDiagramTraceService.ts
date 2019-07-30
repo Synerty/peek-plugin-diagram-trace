@@ -212,9 +212,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 const color = colors.shift();
                 colors.push(color);
 
-                const override = new DiagramOverrideColor(
-                    context.modelSetKey, coordSetKey
-                );
+                const override = new DiagramOverrideColor(context.modelSetKey, null);
 
                 override.setLineColor(color);
                 override.setColor(color);
@@ -230,19 +228,19 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                 this.diagramOverrideService.applyOverride(override);
                 this.appliedOverrides.push(override);
 
-                this.addClearTracesButton(context.modelSetKey, coordSetKey);
+                this.addClearTracesButton(context.modelSetKey);
             })
             .catch(e => this.balloonMsg.showError(`ERROR: Diagram Trace ${e}`));
 
     }
 
-    private addClearTracesButton(modelSetKey: string, coordSetKey: string) {
+    private addClearTracesButton(modelSetKey: string) {
         if (this.appliedOverrides.length != 1)
             return;
 
         this.diagramToolbar.addToolButton(
             modelSetKey,
-            coordSetKey, {
+            null, {
                 key: this.clearTracesButtonKey,
                 name: "Clear Traces",
                 tooltip: "Clear Traces",
