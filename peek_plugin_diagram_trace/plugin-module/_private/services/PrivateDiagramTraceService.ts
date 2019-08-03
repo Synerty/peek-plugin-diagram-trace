@@ -68,6 +68,22 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
         this.clearTracesButtonKey = diagramTraceTuplePrefix
             + "diagramTraceTuplePrefix";
 
+        if (this.diagramLookupService.isReady()) {
+            this.setup();
+
+        } else {
+            this.diagramLookupService
+                .isReadyObservable()
+                .filter(ready => ready)
+                .first()
+                .takeUntil(this.onDestroyEvent)
+                .subscribe(() => this.setup());
+
+        }
+    }
+
+
+    private setup(): void {
         this.objectPopupService
             .popupObservable(DocDbPopupTypeE.summaryPopup)
             .filter((c: DocDbPopupContextI) => c.triggeredByPlugin == diagramPluginName)
@@ -90,6 +106,8 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
         const settingsPropTs = new TupleSelector(
             SettingPropertyTuple.tupleName, {}
         );
+
+
         this.tupleService
             .tupleDataOfflineObserver
             .subscribeToTupleSelector(settingsPropTs)
