@@ -168,87 +168,102 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
         })
     }
 
-
-    private handlePopup(context: DocDbPopupContextI): void {
+    private async handlePopup(context: DocDbPopupContextI): Promise<void> {
         if (context.key == null)
             return;
 
         if (this.originalColorsByModelSet[context.modelSetKey] == null
             || this.originalColorsByModelSet[context.modelSetKey].length == 0) {
-            this.balloonMsg.showError(
-                "No matching trace colors, please configure in Peek Admin"
+            console.log(
+                "ERROR: No matching trace colors, please configure in Peek Admin"
             );
             return;
         }
 
+        const exists = await this.graphDbService
+            .doesKeyExist(context.modelSetKey, context.key);
 
-        this.menusForModelSet(context.modelSetKey)
-            .then((traceConfigs: TraceConfigListItemI[]) => {
-                if (traceConfigs == null || traceConfigs.length == 0)
-                    return;
+        if (!exists)
+            return;
 
-                const rootMenu: DocDbPopupActionI = {
-                    name: null,
-                    tooltip: "Start a trace from this equipment",
-                    icon: 'highlighter',
-                    callback: null,
-                    children: [],
-                    closeOnCallback: false
-                };
+        let traceConfigs: TraceConfigListItemI[] = [];
+        try {
+            traceConfigs = await this.menusForModelSet(context.modelSetKey);
 
-                for (const item of traceConfigs) {
-                    rootMenu.children.push({
-                        name: item.title,
-                        tooltip: `Trace type = ${item.name}`,
-                        icon: null,
-                        callback: () => this.menuClicked(item.key, context),
-                        children: [],
-                        closeOnCallback: true
-                    });
-                }
+        } catch (e) {
+            this.balloonMsg.showError(`ERROR: Diagram Trace ${e}`);
+            return
 
-                context.addAction(rootMenu);
-            })
-            .catch(e => console.log(`ERROR: Diagram Trace ${e}`));
+        }
+
+        if (traceConfigs == null || traceConfigs.length == 0)
+            return;
+
+        const rootMenu: DocDbPopupActionI = {
+            name: null,
+            tooltip: "Start a trace from this equipment",
+            icon: 'highlighter',
+            callback: null,
+            children: [],
+            closeOnCallback: false
+        };
+
+        for (const item of traceConfigs) {
+            rootMenu.children.push({
+                name: item.title,
+                tooltip: `Trace type = ${item.name}`,
+                icon: null,
+                callback: () => this.menuClicked(item.key, context),
+                children: [],
+                closeOnCallback: true
+            });
+        }
+
+        context.addAction(rootMenu);
     }
 
 
-    private menuClicked(traceKey: string, context: DocDbPopupContextI): void {
-        const coordSetKey = context.options.triggeredForContext;
+    private async menuClicked(traceKey: string, context: DocDbPopupContextI): Promise<void> {
+        // const coordSetKey = context.options.triggeredForContext;
 
+        let traceResult: GraphDbTraceResultTuple = null;
+        try {
+            traceResult = await this.graphDbService
+                .getTraceResult(context.modelSetKey, traceKey, context.key);
 
-        this.graphDbService
-            .getTraceResult(context.modelSetKey, traceKey, context.key)
-            .then((traceResult: GraphDbTraceResultTuple) => {
-                if (traceResult.traceAbortedMessage != null) {
-                    this.balloonMsg.showError(traceResult.traceAbortedMessage);
-                    return;
-                }
+        } catch (e) {
+            this.balloonMsg.showError(`ERROR: Diagram Trace ${e}`);
+            return
 
-                // Get the color and rotate the queue
-                const colors = this.colorsByModelSet[context.modelSetKey];
-                const color = colors.shift();
-                colors.push(color);
+        }
 
-                const override = new DiagramOverrideColor(context.modelSetKey, null);
+        if (traceResult.traceAbortedMessage != null) {
+            this.balloonMsg.showError(traceResult.traceAbortedMessage);
+            return;
+        }
 
-                override.setLineColor(color);
-                override.setColor(color);
+        // Get the color and rotate the queue
+        const colors = this.colorsByModelSet[context.modelSetKey];
+        const color = colors.shift();
+        colors.push(color);
 
-                for (let edge of traceResult.edges) {
-                    override.addDispKeys([edge.key]);
-                }
+        const override = new DiagramOverrideColor(context.modelSetKey, null);
 
-                for (let vertex of traceResult.edges) {
-                    override.addDispKeys([vertex.key]);
-                }
+        override.setLineColor(color);
+        override.setColor(color);
 
-                this.diagramOverrideService.applyOverride(override);
-                this.appliedOverrides.push(override);
+        for (let edge of traceResult.edges) {
+            override.addDispKeys([edge.key]);
+        }
 
-                this.addClearTracesButton(context.modelSetKey);
-            })
-            .catch(e => this.balloonMsg.showError(`ERROR: Diagram Trace ${e}`));
+        for (let vertex of traceResult.edges) {
+            override.addDispKeys([vertex.key]);
+        }
+
+        this.diagramOverrideService.applyOverride(override);
+        this.appliedOverrides.push(override);
+
+        this.addClearTracesButton(context.modelSetKey);
 
     }
 
