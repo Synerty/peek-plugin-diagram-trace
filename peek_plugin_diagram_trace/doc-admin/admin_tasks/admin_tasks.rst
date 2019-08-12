@@ -16,7 +16,7 @@ The diagram trace can be edited via the admin UI.
 #.  Click on the **Edit Settings** tab
 
 #.  Enter the color names to use, separated by commas.
-    These color names must match the Diagrams Color loolup names.
+    These color names must match the Diagrams Color lookup names.
 
 #.  Click save.
 

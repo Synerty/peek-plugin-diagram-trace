@@ -31,6 +31,7 @@ import {Ng2BalloonMsgService} from "@synerty/ng2-balloon-msg";
 import {diagramTraceTuplePrefix} from "../PluginNames";
 import {PrivateDiagramTraceTupleService} from "./PrivateDiagramTraceTupleService";
 import {
+    MaxTraceVertexesPropertyName,
     SettingPropertyTuple,
     TraceColorsPropertyName
 } from "../tuples/SettingPropertyTuple";
@@ -53,6 +54,8 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
 
     private originalColorsByModelSet: { [key: string]: DispColor[] } = {};
     private colorsByModelSet: { [key: string]: DispColor[] } = {};
+
+    private maxVertexes: number | null = null;
 
     constructor(private diagramCoordSetService: DiagramCoordSetService,
                 private tupleService: PrivateDiagramTraceTupleService,
@@ -117,6 +120,10 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
                     switch (prop.key) {
                         case TraceColorsPropertyName: {
                             this.loadColors(prop.char_value);
+                            break;
+                        }
+                        case MaxTraceVertexesPropertyName: {
+                            this.maxVertexes = prop.int_value;
                             break;
                         }
                         default: {
@@ -229,7 +236,8 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
         let traceResult: GraphDbTraceResultTuple = null;
         try {
             traceResult = await this.graphDbService
-                .getTraceResult(context.modelSetKey, traceKey, context.key);
+                .getTraceResult(context.modelSetKey, traceKey,
+                    context.key, this.maxVertexes);
 
         } catch (e) {
             this.balloonMsg.showError(`ERROR: Diagram Trace ${e}`);

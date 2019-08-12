@@ -1,4 +1,3 @@
-
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
@@ -10,7 +9,6 @@ from vortex.Tuple import Tuple, addTupleType
 
 from peek_plugin_diagram_trace._private.PluginNames import diagramTraceTuplePrefix
 from .DeclarativeBase import DeclarativeBase
-
 
 """Mapping a polymorphic-valued vertical table as a dictionary.
 
@@ -261,3 +259,7 @@ def globalSetting(ormSession, key=None, value=None):
 TRACE_COLORS = PropertyKey('Trace Colors',
                            'Orange,Dark Red,Light Red,Purple,Orange',
                            propertyDict=globalProperties)
+
+MAX_TRACE_VERTEXES = PropertyKey('Max Trace Vertexes',
+                                 10000,
+                                 propertyDict=globalProperties)
