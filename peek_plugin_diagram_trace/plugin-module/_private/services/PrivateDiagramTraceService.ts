@@ -27,7 +27,7 @@ import {
     GraphDbTraceResultTuple,
     TraceConfigListItemI
 } from "@peek/peek_plugin_graphdb";
-import {Ng2BalloonMsgService} from "@synerty/ng2-balloon-msg";
+import { BalloonMsgService } from "@synerty/peek-plugin-base-js"
 import {diagramTraceTuplePrefix} from "../PluginNames";
 import {PrivateDiagramTraceTupleService} from "./PrivateDiagramTraceTupleService";
 import {
@@ -59,7 +59,7 @@ export class PrivateDiagramTraceService extends ComponentLifecycleEventEmitter {
 
     constructor(private diagramCoordSetService: DiagramCoordSetService,
                 private tupleService: PrivateDiagramTraceTupleService,
-                private balloonMsg: Ng2BalloonMsgService,
+                private balloonMsg: BalloonMsgService,
                 private diagramBranchService: DiagramBranchService,
                 private objectPopupService: DocDbPopupService,
                 private diagramToolbar: DiagramToolbarService,
