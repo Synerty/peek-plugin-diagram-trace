@@ -7,13 +7,13 @@ import {
     diagramPluginName,
     DiagramToolbarService,
     ToolbarTypeE
-} from "@peek/peek_plugin_diagram"
-import { DocDbPopupActionI, DocDbPopupContextI, DocDbPopupService, DocDbPopupTypeE } from "@peek/peek_plugin_docdb"
-import { DiagramOverrideColor } from "@peek/peek_plugin_diagram/override"
-import { DispColor } from "@peek/peek_plugin_diagram/lookups"
+} from "@_peek/peek_plugin_diagram"
+import { DocDbPopupActionI, DocDbPopupContextI, DocDbPopupService, DocDbPopupTypeE } from "@_peek/peek_plugin_docdb"
+import { DiagramOverrideColor } from "@_peek/peek_plugin_diagram/override"
+import { DispColor } from "@_peek/peek_plugin_diagram/lookups"
 import { TupleSelector } from "@synerty/vortexjs"
 import { BalloonMsgService, NgLifeCycleEvents } from "@synerty/peek-plugin-base-js"
-import { GraphDbService, GraphDbTraceResultTuple, TraceConfigListItemI } from "@peek/peek_plugin_graphdb"
+import { GraphDbService, GraphDbTraceResultTuple, TraceConfigListItemI } from "@_peek/peek_plugin_graphdb"
 import { diagramTraceTuplePrefix } from "../PluginNames"
 import { PrivateDiagramTraceTupleService } from "./PrivateDiagramTraceTupleService"
 import {
