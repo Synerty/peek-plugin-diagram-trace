@@ -196,7 +196,7 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
         const rootMenu: DocDbPopupActionI = {
             name: null,
             tooltip: "Start a trace from this equipment",
-            icon: "highlighter",
+            icon: "highlight",
             callback: null,
             children: [],
             closeOnCallback: false
