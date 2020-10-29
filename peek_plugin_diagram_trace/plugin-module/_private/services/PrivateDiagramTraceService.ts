@@ -8,7 +8,7 @@ import {
     DiagramToolbarService,
     ToolbarTypeE
 } from "@peek/peek_plugin_diagram"
-import { DocDbPopupActionI, DocDbPopupContextI, DocDbPopupService, DocDbPopupTypeE } from "@peek/peek_plugin_docdb"
+import { DocDbPopupActionI, DocDbPopupContextI, DocDbPopupService, DocDbPopupTypeE } from "@peek/peek_core_docdb"
 import { DiagramOverrideColor } from "@peek/peek_plugin_diagram/override"
 import { DispColor } from "@peek/peek_plugin_diagram/lookups"
 import { TupleSelector } from "@synerty/vortexjs"
