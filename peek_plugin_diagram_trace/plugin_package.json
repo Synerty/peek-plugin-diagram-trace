@@ -12,9 +12,8 @@
         "server",
         "storage",
         "admin",
-        "client",
-        "mobile",
-        "desktop",
+        "field",
+        "office",
         "doc-admin"
     ],
     "server": {
@@ -32,9 +31,8 @@
         "appModule": "diagramTrace.module#DiagramTraceModule",
         "moduleDir": "plugin-module"
     },
-    "client": {
-    },
-    "mobile": {
+
+    "field": {
         "moduleDir": "plugin-module",
         "rootServices": [
             {
@@ -49,7 +47,7 @@
             }
         ]
     },
-    "desktop": {
+    "office": {
         "moduleDir": "plugin-module",
         "rootServices": [
             {
