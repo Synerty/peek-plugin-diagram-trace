@@ -275,7 +275,7 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
                 key: this.clearTracesButtonKey,
                 name: "Clear Traces",
                 tooltip: "Clear Traces",
-                icon: "eraser",
+                icon: "clear",
                 callback: () => this.clearAllTraces(),
                 children: []
             },
