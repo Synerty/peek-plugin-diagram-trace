@@ -9,14 +9,14 @@
         "website": "www.synerty.com"
     },
     "requiresServices": [
-        "server",
+        "logic",
         "storage",
         "admin",
         "field",
         "office",
         "doc-admin"
     ],
-    "server": {
+    "logic": {
     },
     "doc-admin": {
         "docDir": "doc-admin",

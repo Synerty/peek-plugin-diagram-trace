@@ -1,6 +1,6 @@
 import logging
 
-from peek_plugin_base.server.PluginServerEntryHookABC import PluginServerEntryHookABC
+from peek_plugin_base.server.PluginLogicEntryHookABC import PluginLogicEntryHookABC
 from peek_plugin_base.server.PluginServerStorageEntryHookABC import \
     PluginServerStorageEntryHookABC
 from peek_plugin_diagram_trace._private.storage import DeclarativeBase
@@ -15,11 +15,11 @@ from .controller.MainController import MainController
 logger = logging.getLogger(__name__)
 
 
-class ServerEntryHook(PluginServerEntryHookABC, PluginServerStorageEntryHookABC):
+class LogicEntryHook(PluginLogicEntryHookABC, PluginServerStorageEntryHookABC):
     def __init__(self, *args, **kwargs):
         """" Constructor """
         # Call the base classes constructor
-        PluginServerEntryHookABC.__init__(self, *args, **kwargs)
+        PluginLogicEntryHookABC.__init__(self, *args, **kwargs)
 
         #: Loaded Objects, This is a list of all objects created when we start
         self._loadedObjects = []
