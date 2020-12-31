@@ -14,12 +14,12 @@
         "admin",
         "field",
         "office",
-        "doc-admin"
+        "admin-doc"
     ],
     "logic": {
     },
-    "doc-admin": {
-        "docDir": "doc-admin",
+    "admin-doc": {
+        "docDir": "admin-doc",
         "docRst": "index.rst"
     },
     "storage": {
