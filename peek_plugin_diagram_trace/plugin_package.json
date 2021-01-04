@@ -31,7 +31,6 @@
         "appModule": "diagramTrace.module#DiagramTraceModule",
         "moduleDir": "plugin-module"
     },
-
     "field": {
         "moduleDir": "plugin-module",
         "rootServices": [

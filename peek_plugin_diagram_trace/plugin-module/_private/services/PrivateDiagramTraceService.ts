@@ -8,12 +8,24 @@ import {
     DiagramToolbarService,
     ToolbarTypeE
 } from "@peek/peek_plugin_diagram"
-import { DocDbPopupActionI, DocDbPopupContextI, DocDbPopupService, DocDbPopupTypeE } from "@peek/peek_core_docdb"
+import {
+    DocDbPopupActionI,
+    DocDbPopupContextI,
+    DocDbPopupService,
+    DocDbPopupTypeE
+} from "@peek/peek_core_docdb"
 import { DiagramOverrideColor } from "@peek/peek_plugin_diagram/override"
 import { DispColor } from "@peek/peek_plugin_diagram/lookups"
 import { TupleSelector } from "@synerty/vortexjs"
-import { BalloonMsgService, NgLifeCycleEvents } from "@synerty/peek-plugin-base-js"
-import { GraphDbService, GraphDbTraceResultTuple, TraceConfigListItemI } from "@peek/peek_plugin_graphdb"
+import {
+    BalloonMsgService,
+    NgLifeCycleEvents
+} from "@synerty/peek-plugin-base-js"
+import {
+    GraphDbService,
+    GraphDbTraceResultTuple,
+    TraceConfigListItemI
+} from "@peek/peek_plugin_graphdb"
 import { diagramTraceTuplePrefix } from "../PluginNames"
 import { PrivateDiagramTraceTupleService } from "./PrivateDiagramTraceTupleService"
 import {
@@ -196,7 +208,7 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
         const rootMenu: DocDbPopupActionI = {
             name: null,
             tooltip: "Start a trace from this equipment",
-            icon: 'highlight',
+            icon: "highlight",
             callback: null,
             children: [],
             closeOnCallback: false

@@ -2,27 +2,33 @@
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
         <!-- Home Tab -->
-        <li role="presentation" class="active">
-            <a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a>
+        <li class="active" role="presentation">
+            <a aria-controls="home" data-toggle="tab" href="#home" role="tab">
+                Home
+            </a>
         </li>
         <!-- Edit Settings Tab -->
         <li role="presentation">
-            <a href="#editSetting" aria-controls="editSetting" role="tab"
-               data-toggle="tab">Edit Settings</a>
+            <a
+                aria-controls="editSetting" data-toggle="tab"
+                href="#editSetting"
+                role="tab"
+            >Edit Settings
+            </a>
         </li>
     </ul>
-
+    
     <!-- Tab panes -->
     <div class="tab-content">
         <!-- Edit Settings Tab -->
-        <div role="tabpanel" class="tab-pane" id="editSetting">
+        <div class="tab-pane" id="editSetting" role="tabpanel">
             <pl-diagram-trace-edit-setting></pl-diagram-trace-edit-setting>
         </div>
         <!-- Home Tab -->
-        <div role="tabpanel" class="tab-pane active" id="home">
+        <div class="tab-pane active" id="home" role="tabpanel">
             <h1 class="text-center">Diagram Trace Plugin</h1>
             <p>This plugin integrates the trace support into the Diagram.</p>
         </div>
-
+    
     </div>
 </div>

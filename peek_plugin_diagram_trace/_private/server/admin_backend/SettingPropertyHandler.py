@@ -5,8 +5,10 @@ from vortex.handler.TupleDataObservableHandler import TupleDataObservableHandler
 from vortex.sqla_orm.OrmCrudHandler import OrmCrudHandler, OrmCrudHandlerExtension
 
 from peek_plugin_diagram_trace._private.PluginNames import diagramTraceFilt
-from peek_plugin_diagram_trace._private.storage.Setting import SettingProperty, \
-    globalSetting
+from peek_plugin_diagram_trace._private.storage.Setting import (
+    SettingProperty,
+    globalSetting,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +26,7 @@ class __CrudHandler(OrmCrudHandler):
 
 
 class __ExtUpdateObservable(OrmCrudHandlerExtension):
-    """ Update Observable ORM Crud Extension
+    """Update Observable ORM Crud Extension
 
     This extension is called after events that will alter data,
     it then notifies the observer.
@@ -45,10 +47,12 @@ class __ExtUpdateObservable(OrmCrudHandlerExtension):
 
 
 # This method creates an instance of the handler class.
-def makeSettingPropertyHandler(dbSessionCreator,
-                               tupleObservable: TupleDataObservableHandler):
-    handler = __CrudHandler(dbSessionCreator, SettingProperty,
-                            filtKey, retreiveAll=True)
+def makeSettingPropertyHandler(
+    dbSessionCreator, tupleObservable: TupleDataObservableHandler
+):
+    handler = __CrudHandler(
+        dbSessionCreator, SettingProperty, filtKey, retreiveAll=True
+    )
 
     handler.addExtension(SettingProperty, __ExtUpdateObservable(tupleObservable))
 

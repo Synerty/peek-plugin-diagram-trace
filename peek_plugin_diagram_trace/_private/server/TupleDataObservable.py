@@ -1,13 +1,14 @@
 from peek_plugin_diagram_trace._private.PluginNames import diagramTraceFilt
 from peek_plugin_diagram_trace._private.PluginNames import diagramTraceObservableName
-from peek_plugin_diagram_trace._private.server.tuple_providers.SettingPropertyTupleProvider import \
-    SettingPropertyTupleProvider
+from peek_plugin_diagram_trace._private.server.tuple_providers.SettingPropertyTupleProvider import (
+    SettingPropertyTupleProvider,
+)
 from peek_plugin_diagram_trace._private.storage.Setting import SettingProperty
 from vortex.handler.TupleDataObservableHandler import TupleDataObservableHandler
 
 
 def makeTupleDataObservableHandler(ormSessionCreator):
-    """" Make Tuple Data Observable Handler
+    """ " Make Tuple Data Observable Handler
 
     This method creates the observable object, registers the tuple providers and then
     returns it.
@@ -18,10 +19,11 @@ def makeTupleDataObservableHandler(ormSessionCreator):
 
     """
     tupleObservable = TupleDataObservableHandler(
-        observableName=diagramTraceObservableName,
-        additionalFilt=diagramTraceFilt)
+        observableName=diagramTraceObservableName, additionalFilt=diagramTraceFilt
+    )
 
-    tupleObservable.addTupleProvider(SettingProperty.tupleName(),
-                                     SettingPropertyTupleProvider(ormSessionCreator))
+    tupleObservable.addTupleProvider(
+        SettingProperty.tupleName(), SettingPropertyTupleProvider(ormSessionCreator)
+    )
 
     return tupleObservable
