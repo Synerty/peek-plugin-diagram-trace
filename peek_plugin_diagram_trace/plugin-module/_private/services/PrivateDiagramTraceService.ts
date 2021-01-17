@@ -16,11 +16,8 @@ import {
 } from "@peek/peek_core_docdb"
 import { DiagramOverrideColor } from "@peek/peek_plugin_diagram/override"
 import { DispColor } from "@peek/peek_plugin_diagram/lookups"
-import { TupleSelector } from "@synerty/vortexjs"
-import {
-    BalloonMsgService,
-    NgLifeCycleEvents
-} from "@synerty/peek-plugin-base-js"
+import { NgLifeCycleEvents, TupleSelector } from "@synerty/vortexjs"
+import { BalloonMsgService } from "@synerty/peek-plugin-base-js"
 import {
     GraphDbService,
     GraphDbTraceResultTuple,
