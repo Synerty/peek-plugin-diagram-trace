@@ -14,6 +14,7 @@
         "admin",
         "field",
         "office",
+        "office-doc",
         "admin-doc"
     ],
     "logic": {
@@ -24,6 +25,10 @@
     },
     "storage": {
         "alembicDir": "_private/alembic"
+    },
+    "office-doc": {
+        "docDir": "both-doc",
+        "docRst": "index.rst"
     },
     "admin": {
         "showHomeLink": true,
