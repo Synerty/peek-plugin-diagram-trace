@@ -1,2 +1,2 @@
-export * from "./PluginNames"
-export { SettingPropertyTuple } from "./tuples/SettingPropertyTuple"
+export * from "./PluginNames";
+export { SettingPropertyTuple } from "./tuples/SettingPropertyTuple";

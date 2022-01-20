@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from "@angular/core"
+import { Injectable } from "@angular/core";
 import {
     TupleActionPushNameService,
     TupleActionPushOfflineService,
@@ -9,53 +9,58 @@ import {
     TupleOfflineStorageService,
     TupleStorageFactoryService,
     VortexService,
-    VortexStatusService
-} from "@synerty/vortexjs"
+    VortexStatusService,
+} from "@synerty/vortexjs";
 
 import {
     diagramTraceActionProcessorName,
     diagramTraceFilt,
     diagramTraceObservableName,
-    diagramTraceTupleOfflineServiceName
-} from "../PluginNames"
+    diagramTraceTupleOfflineServiceName,
+} from "../PluginNames";
 
 @Injectable()
 export class PrivateDiagramTraceTupleService {
-    
-    public tupleOfflineAction: TupleActionPushOfflineService
-    public tupleDataOfflineObserver: TupleDataOfflineObserverService
-    
+    public tupleOfflineAction: TupleActionPushOfflineService;
+    public tupleDataOfflineObserver: TupleDataOfflineObserverService;
+
     constructor(
         tupleActionSingletonService: TupleActionPushOfflineSingletonService,
         vortexService: VortexService,
         vortexStatusService: VortexStatusService,
         storageFactory: TupleStorageFactoryService
     ) {
-        
         let tupleDataObservableName = new TupleDataObservableNameService(
-            diagramTraceObservableName, diagramTraceFilt)
-        
+            diagramTraceObservableName,
+            diagramTraceFilt
+        );
+
         let storageName = new TupleOfflineStorageNameService(
-            diagramTraceTupleOfflineServiceName)
-        
+            diagramTraceTupleOfflineServiceName
+        );
+
         let tupleActionName = new TupleActionPushNameService(
-            diagramTraceActionProcessorName, diagramTraceFilt)
-        
+            diagramTraceActionProcessorName,
+            diagramTraceFilt
+        );
+
         let tupleOfflineStorageService = new TupleOfflineStorageService(
-            storageFactory, storageName)
-        
+            storageFactory,
+            storageName
+        );
+
         this.tupleDataOfflineObserver = new TupleDataOfflineObserverService(
             vortexService,
             vortexStatusService,
             tupleDataObservableName,
-            tupleOfflineStorageService)
-        
+            tupleOfflineStorageService
+        );
+
         this.tupleOfflineAction = new TupleActionPushOfflineService(
             tupleActionName,
             vortexService,
             vortexStatusService,
-            tupleActionSingletonService)
-        
+            tupleActionSingletonService
+        );
     }
-    
 }
