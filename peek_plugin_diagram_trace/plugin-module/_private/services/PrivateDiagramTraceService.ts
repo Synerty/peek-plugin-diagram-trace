@@ -1,3 +1,4 @@
+import { filter, first, takeUntil } from "rxjs/operators";
 import { Injectable } from "@angular/core";
 import {
     DiagramBranchService,
@@ -70,9 +71,9 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
         } else {
             this.diagramLookupService
                 .isReadyObservable()
-                .filter((ready) => ready)
-                .first()
-                .takeUntil(this.onDestroyEvent)
+                .pipe(filter((ready) => ready))
+                .pipe(first())
+                .pipe(takeUntil(this.onDestroyEvent))
                 .subscribe(() => this.setup());
         }
     }
@@ -80,26 +81,30 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
     private setup(): void {
         this.objectPopupService
             .popupObservable(DocDbPopupTypeE.summaryPopup)
-            .filter(
-                (c: DocDbPopupContextI) =>
-                    c.triggeredByPlugin == diagramPluginName
+            .pipe(
+                filter(
+                    (c: DocDbPopupContextI) =>
+                        c.triggeredByPlugin == diagramPluginName
+                )
             )
-            .takeUntil(this.onDestroyEvent)
+            .pipe(takeUntil(this.onDestroyEvent))
             .subscribe((c: DocDbPopupContextI) => this.handlePopup(c));
 
         this.objectPopupService
             .popupObservable(DocDbPopupTypeE.detailPopup)
-            .filter(
-                (c: DocDbPopupContextI) =>
-                    c.triggeredByPlugin == diagramPluginName
+            .pipe(
+                filter(
+                    (c: DocDbPopupContextI) =>
+                        c.triggeredByPlugin == diagramPluginName
+                )
             )
-            .takeUntil(this.onDestroyEvent)
+            .pipe(takeUntil(this.onDestroyEvent))
             .subscribe((c: DocDbPopupContextI) => this.handlePopup(c));
 
         // Remove all traces if the diagram goes into edit mode
         this.diagramBranchService
             .startEditingObservable()
-            .takeUntil(this.onDestroyEvent)
+            .pipe(takeUntil(this.onDestroyEvent))
             .subscribe(() => this.clearAllTraces());
 
         const settingsPropTs = new TupleSelector(
@@ -109,7 +114,7 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
 
         this.tupleService.tupleDataOfflineObserver
             .subscribeToTupleSelector(settingsPropTs)
-            .takeUntil(this.onDestroyEvent)
+            .pipe(takeUntil(this.onDestroyEvent))
             .subscribe((tuples: SettingPropertyTuple[]) => {
                 for (const prop of tuples) {
                     switch (prop.key) {
@@ -162,7 +167,7 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
         return new Promise<TraceConfigListItemI[]>((resolve, reject) => {
             this.graphDbService
                 .traceConfigListItemsObservable(modelSetKey)
-                .takeUntil(this.onDestroyEvent)
+                .pipe(takeUntil(this.onDestroyEvent))
                 .subscribe((tuples: TraceConfigListItemI[]) => {
                     this.traceConfigsByModelSetKey[modelSetKey] = tuples;
                     resolve(tuples);
