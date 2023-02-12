@@ -44,8 +44,10 @@
                 "persistent": true
             },
             {
-                "file": "_private/services/PrivateDiagramTraceService",
-                "class": "PrivateDiagramTraceService",
+                "useClassFile": "_private/services/PrivateDiagramTraceService",
+                "useClassClass": "PrivateDiagramTraceService",
+                "file": "DiagramTraceService",
+                "class": "DiagramTraceService",
                 "persistent": true
             }
         ]
@@ -59,8 +61,10 @@
                 "persistent": true
             },
             {
-                "file": "_private/services/PrivateDiagramTraceService",
-                "class": "PrivateDiagramTraceService",
+                "useClassFile": "_private/services/PrivateDiagramTraceService",
+                "useClassClass": "PrivateDiagramTraceService",
+                "file": "DiagramTraceService",
+                "class": "DiagramTraceService",
                 "persistent": true
             }
         ]

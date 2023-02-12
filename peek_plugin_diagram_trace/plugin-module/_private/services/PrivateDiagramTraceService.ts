@@ -31,6 +31,10 @@ import {
     SettingPropertyTuple,
     TraceColorsPropertyName,
 } from "../tuples/SettingPropertyTuple";
+import {
+    DiagramTraceI,
+    DiagramTraceService,
+} from "@peek/peek_plugin_diagram_trace/DiagramTraceService";
 
 /** DMS Diagram Item Popup Service
  *
@@ -40,11 +44,15 @@ import {
  *
  */
 @Injectable()
-export class PrivateDiagramTraceService extends NgLifeCycleEvents {
+export class PrivateDiagramTraceService
+    extends NgLifeCycleEvents
+    implements DiagramTraceService
+{
     private traceConfigsByModelSetKey: {
         [modelSetKey: string]: TraceConfigListItemI[];
     } = {};
     private appliedOverrides: DiagramOverrideColor[] = [];
+    private _activeTraces: DiagramTraceI[] = [];
     private readonly clearTracesButtonKey: string;
     private originalColorsByModelSet: { [key: string]: DispColor[] } = {};
     private colorsByModelSet: { [key: string]: DispColor[] } = {};
@@ -76,6 +84,10 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
                 .pipe(takeUntil(this.onDestroyEvent))
                 .subscribe(() => this.setup());
         }
+    }
+
+    get activeTraces(): DiagramTraceI[] {
+        return this._activeTraces;
     }
 
     private setup(): void {
@@ -273,6 +285,13 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
         this.diagramOverrideService.applyOverride(override);
         this.appliedOverrides.push(override);
 
+        this._activeTraces.push({
+            modelSetKey: context.modelSetKey,
+            startKey: context.key,
+            traceKey: traceKey,
+            traceModel: traceResult,
+        });
+
         this.addClearTracesButton(context.modelSetKey);
     }
 
@@ -310,6 +329,8 @@ export class PrivateDiagramTraceService extends NgLifeCycleEvents {
             const override = this.appliedOverrides.pop();
             this.diagramOverrideService.removeOverride(override);
         }
+
+        this._activeTraces = [];
 
         this.removeClearTracesButton();
     }
