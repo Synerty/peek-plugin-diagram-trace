@@ -16,7 +16,7 @@ import {
     DocDbPopupTypeE,
 } from "@peek/peek_core_docdb";
 import { DiagramOverrideColor } from "@peek/peek_plugin_diagram/override";
-import { DispColor } from "@peek/peek_plugin_diagram/lookups";
+import { ShapeColorTuple } from "@peek/peek_plugin_diagram/lookup_tuples";
 import { NgLifeCycleEvents, TupleSelector } from "@synerty/vortexjs";
 import { BalloonMsgService } from "@synerty/peek-plugin-base-js";
 import {
@@ -54,8 +54,8 @@ export class PrivateDiagramTraceService
     private appliedOverrides: DiagramOverrideColor[] = [];
     private _activeTraces: DiagramTraceI[] = [];
     private readonly clearTracesButtonKey: string;
-    private originalColorsByModelSet: { [key: string]: DispColor[] } = {};
-    private colorsByModelSet: { [key: string]: DispColor[] } = {};
+    private originalColorsByModelSet: { [key: string]: ShapeColorTuple[] } = {};
+    private colorsByModelSet: { [key: string]: ShapeColorTuple[] } = {};
     private maxVertexes: number | null = null;
 
     constructor(
