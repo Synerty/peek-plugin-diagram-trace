@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "peek-plugin-diagram-trace"
+version = "0.0.0"
+authors = [{name = "Synerty", email = "contact@synerty.com"}]
+description = "Peek Plugin DiagramTrace - My first enhancement."
+keywords = ["Peek", "Python", "Platform", "synerty"]
+classifiers = []
+dependencies = ["peek-plugin-base==0.0.*,>=0.0.0"]
+
+[project.urls]
+Homepage = "https://bitbucket.org/synerty/peek-plugin-diagram-trace"
+Download = "https://bitbucket.org/synerty/peek-plugin-diagram-trace/get/0.0.0.zip"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+exclude = ["*.tests"] # *.tests.*; tests.*; tests
+namespaces = false
